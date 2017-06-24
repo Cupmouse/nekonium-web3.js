@@ -7,7 +7,7 @@
 
     var Web3 = require('web3');
     var web3 = new Web3();
-    web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
+    web3.setProvider(new web3.providers.HttpProvider("http://localhost:8293"));
     var from = web3.eth.coinbase;
     web3.eth.defaultAccount = from;
 
@@ -62,7 +62,7 @@
 </script>
 </head>
 <body>
-    <i>This example shows only part of namereg functionalities. Namereg contract is available <a href="https://github.com/ethereum/dapp-bin/blob/master/GlobalRegistrar/contract.sol">here</a>
+    <i>This example shows only part of namereg functionalities. Namereg contract is available <a href="https://github.com/nekonium/dapp-bin/blob/master/GlobalRegistrar/contract.sol">here</a>
     </i>
     <h1>Namereg</h1>
     <h3>Search for name</h3>
