@@ -1,7 +1,6 @@
 {
-  "name": "web3",
-  "namespace": "nekonium",
-  "version": "0.20.0",
+  "name": "@nekonium/web3",
+  "version": "0.20.1",
   "description": "Nekonium JavaScript API, middleware to talk to a nekonium node over RPC",
   "main": "./index.js",
   "directories": {

@@ -2138,20 +2138,20 @@ var getValueOfUnit = function (unit) {
 };
 
 /**
- * Takes a number of wei and converts it to any other ether unit.
+ * Takes a number of wei and converts it to any other nuko unit.
  *
  * Possible units are:
  *   SI Short   SI Full        Effigy       Other
- * - kwei       femtoether     babbage
- * - mwei       picoether      lovelace
- * - gwei       nanoether      shannon      nano
- * - --         microether     szabo        micro
- * - --         milliether     finney       milli
- * - ether      --             --
- * - kether                    --           grand
- * - mether
- * - gether
- * - tether
+ * - kwei       femtonuko     babbage
+ * - mwei       piconuko      lovelace
+ * - gwei       nanonuko      shannon      nano
+ * - --         micronuko     szabo        micro
+ * - --         millinuko     finney       milli
+ * - nuko      --             --
+ * - knuko                    --           grand
+ * - mnuko
+ * - gnuko
+ * - tnuko
  *
  * @method fromWei
  * @param {Number|String} number can be a number, number string or a HEX of a decimal
@@ -2169,17 +2169,17 @@ var fromWei = function(number, unit) {
  *
  * Possible units are:
  *   SI Short   SI Full        Effigy       Other
- * - kwei       femtoether     babbage
- * - mwei       picoether      lovelace
- * - gwei       nanoether      shannon      nano
- * - --         microether     szabo        micro
- * - --         microether     szabo        micro
- * - --         milliether     finney       milli
- * - ether      --             --
- * - kether                    --           grand
- * - mether
- * - gether
- * - tether
+ * - kwei       femtonuko     babbage
+ * - mwei       piconuko      lovelace
+ * - gwei       nanonuko      shannon      nano
+ * - --         micronuko     szabo        micro
+ * - --         micronuko     szabo        micro
+ * - --         millinuko     finney       milli
+ * - nuko      --             --
+ * - knuko                    --           grand
+ * - mnuko
+ * - gnuko
+ * - tnuko
  *
  * @method toWei
  * @param {Number|String|BigNumber} number can be a number, number string or a HEX of a decimal
@@ -2531,7 +2531,7 @@ function Web3 (provider) {
     this._requestManager = new RequestManager(provider);
     this.currentProvider = provider;
     this.eth = new Eth(this);
-    this.nekonium = this.eth
+    this.nekonium = this.eth;
     this.db = new DB(this);
     this.shh = new Shh(this);
     this.net = new Net(this);
