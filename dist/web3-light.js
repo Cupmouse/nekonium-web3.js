@@ -735,68 +735,52 @@ SolidityCoder.prototype.encodeMultiWithOffset = function (types, solidityTypes, 
     return result;
 };
 
-// TODO: refactor whole encoding!
 SolidityCoder.prototype.encodeWithOffset = function (type, solidityType, encoded, offset) {
+    /* jshint maxcomplexity: 17 */
+    /* jshint maxdepth: 5 */
+
     var self = this;
-    if (solidityType.isDynamicArray(type)) {
-        return (function () {
-            // offset was already set
-            var nestedName = solidityType.nestedName(type);
-            var nestedStaticPartLength = solidityType.staticPartLength(nestedName);
-            var result = encoded[0];
+    var encodingMode={dynamic:1,static:2,other:3};
 
-            (function () {
-                var previousLength = 2; // in int
-                if (solidityType.isDynamicArray(nestedName)) {
-                    for (var i = 1; i < encoded.length; i++) {
-                        previousLength += +(encoded[i - 1])[0] || 0;
-                        result += f.formatInputInt(offset + i * nestedStaticPartLength + previousLength * 32).encode();
-                    }
+    var mode=(solidityType.isDynamicArray(type)?encodingMode.dynamic:(solidityType.isStaticArray(type)?encodingMode.static:encodingMode.other));
+
+    if(mode !== encodingMode.other){
+        var nestedName = solidityType.nestedName(type);
+        var nestedStaticPartLength = solidityType.staticPartLength(nestedName);
+        var result = (mode === encodingMode.dynamic ? encoded[0] : '');
+
+        if (solidityType.isDynamicArray(nestedName)) {
+            var previousLength = (mode === encodingMode.dynamic ? 2 : 0);
+
+            for (var i = 0; i < encoded.length; i++) {
+                // calculate length of previous item
+                if(mode === encodingMode.dynamic){
+                    previousLength += +(encoded[i - 1])[0] || 0;
                 }
-            })();
-
-            // first element is length, skip it
-            (function () {
-                for (var i = 0; i < encoded.length - 1; i++) {
-                    var additionalOffset = result / 2;
-                    result += self.encodeWithOffset(nestedName, solidityType, encoded[i + 1], offset +  additionalOffset);
+                else if(mode === encodingMode.static){
+                    previousLength += +(encoded[i - 1] || [])[0] || 0;
                 }
-            })();
-
-            return result;
-        })();
-
-    } else if (solidityType.isStaticArray(type)) {
-        return (function () {
-            var nestedName = solidityType.nestedName(type);
-            var nestedStaticPartLength = solidityType.staticPartLength(nestedName);
-            var result = "";
-
-
-            if (solidityType.isDynamicArray(nestedName)) {
-                (function () {
-                    var previousLength = 0; // in int
-                    for (var i = 0; i < encoded.length; i++) {
-                        // calculate length of previous item
-                        previousLength += +(encoded[i - 1] || [])[0] || 0;
-                        result += f.formatInputInt(offset + i * nestedStaticPartLength + previousLength * 32).encode();
-                    }
-                })();
+                result += f.formatInputInt(offset + i * nestedStaticPartLength + previousLength * 32).encode();
             }
+        }
 
-            (function () {
-                for (var i = 0; i < encoded.length; i++) {
-                    var additionalOffset = result / 2;
-                    result += self.encodeWithOffset(nestedName, solidityType, encoded[i], offset + additionalOffset);
-                }
-            })();
+        var len= (mode === encodingMode.dynamic ? encoded.length-1 : encoded.length);
+        for (var c = 0; c < len; c++) {
+            var additionalOffset = result / 2;
+            if(mode === encodingMode.dynamic){
+                result += self.encodeWithOffset(nestedName, solidityType, encoded[c + 1], offset +  additionalOffset);
+            }
+            else if(mode === encodingMode.static){
+                result += self.encodeWithOffset(nestedName, solidityType, encoded[c], offset + additionalOffset);
+            }
+        }
 
-            return result;
-        })();
+        return result;
     }
 
     return encoded;
 };
+
 
 /**
  * Should be used to decode bytes to plain param
@@ -1884,33 +1868,42 @@ var sha3 = require('./sha3.js');
 var utf8 = require('utf8');
 
 var unitMap = {
-    'nonuko':      '0',
+    'noether':      '0',
+    'nonuko':       '0',
     'wei':          '1',
     'kwei':         '1000',
     'Kwei':         '1000',
     'babbage':      '1000',
-    'femtonuko':   '1000',
+    'femtoether':   '1000',
+    'femtonuko':    '1000',
     'mwei':         '1000000',
     'Mwei':         '1000000',
     'lovelace':     '1000000',
-    'piconuko':    '1000000',
+    'picoether':    '1000000',
+    'piconuko':     '1000000',
     'gwei':         '1000000000',
     'Gwei':         '1000000000',
     'shannon':      '1000000000',
-    'nanonuko':    '1000000000',
+    'nanoether':    '1000000000',
+    'nanonuko':     '1000000000',
     'nano':         '1000000000',
     'szabo':        '1000000000000',
-    'micronuko':   '1000000000000',
+    'microether':   '1000000000000',
+    'micronuko':    '1000000000000',
     'micro':        '1000000000000',
     'finney':       '1000000000000000',
     'millinuko':    '1000000000000000',
-    'milli':         '1000000000000000',
-    'nuko':        '1000000000000000000',
-    'knuko':       '1000000000000000000000',
+    'ether':        '1000000000000000000',
+    'nuko':         '1000000000000000000',
+    'kether':       '1000000000000000000000',
+    'knuko':        '1000000000000000000000',
     'grand':        '1000000000000000000000',
-    'mnuko':       '1000000000000000000000000',
-    'gnuko':       '1000000000000000000000000000',
-    'tnuko':       '1000000000000000000000000000000'
+    'mether':       '1000000000000000000000000',
+    'mnuko':        '1000000000000000000000000',
+    'gether':       '1000000000000000000000000000',
+    'gnuko':        '1000000000000000000000000000',
+    'tether':       '1000000000000000000000000000000',
+    'tnuko':        '1000000000000000000000000000000'
 };
 
 /**
@@ -1990,18 +1983,24 @@ var toAscii = function(hex) {
  *
  * @method fromUtf8
  * @param {String} string
- * @param {Number} optional padding
+ * @param {Boolean} allowZero to convert code point zero to 00 instead of end of string
  * @returns {String} hex representation of input string
  */
-var fromUtf8 = function(str) {
+var fromUtf8 = function(str, allowZero) {
     str = utf8.encode(str);
     var hex = "";
     for(var i = 0; i < str.length; i++) {
         var code = str.charCodeAt(i);
-        if (code === 0)
-            break;
-        var n = code.toString(16);
-        hex += n.length < 2 ? '0' + n : n;
+        if (code === 0) {
+            if (allowZero) {
+                hex += '00';
+            } else {
+                break;
+            }
+        } else {
+            var n = code.toString(16);
+            hex += n.length < 2 ? '0' + n : n;
+        }
     }
 
     return "0x" + hex;
@@ -2050,15 +2049,22 @@ var transformToFullName = function (json) {
  * @returns {String} display name for function/event eg. multiply(uint256) -> multiply
  */
 var extractDisplayName = function (name) {
-    var length = name.indexOf('(');
-    return length !== -1 ? name.substr(0, length) : name;
+    var stBracket = name.indexOf('(');
+    var endBracket = name.indexOf(')');
+    return (stBracket !== -1 && endBracket !== -1) ? name.substr(0, stBracket) : name;
 };
 
-/// @returns overloaded part of function/event name
+/**
+ * Should be called to get type name of contract function
+ *
+ * @method extractTypeName
+ * @param {String} name of function/event
+ * @returns {String} type name for function/event eg. multiply(uint256) -> uint256
+ */
 var extractTypeName = function (name) {
-    /// TODO: make it invulnerable
-    var length = name.indexOf('(');
-    return length !== -1 ? name.substr(length + 1, name.length - 1 - (length + 1)).replace(' ', '') : "";
+    var stBracket = name.indexOf('(');
+    var endBracket = name.indexOf(')');
+    return (stBracket !== -1 && endBracket !== -1) ? name.substr(stBracket + 1, endBracket - stBracket - 1).replace(' ', '') : "";
 };
 
 /**
@@ -2114,7 +2120,7 @@ var toHex = function (val) {
         else if(val.indexOf('0x') === 0)
             return val;
         else if (!isFinite(val))
-            return fromAscii(val);
+            return fromUtf8(val,1);
     }
 
     return fromDecimal(val);
@@ -2169,17 +2175,16 @@ var fromWei = function(number, unit) {
  *
  * Possible units are:
  *   SI Short   SI Full        Effigy       Other
- * - kwei       femtonuko     babbage
- * - mwei       piconuko      lovelace
- * - gwei       nanonuko      shannon      nano
- * - --         micronuko     szabo        micro
- * - --         micronuko     szabo        micro
- * - --         millinuko     finney       milli
- * - nuko      --             --
- * - knuko                    --           grand
- * - mnuko
- * - gnuko
- * - tnuko
+ * - kwei       femtoether     babbage
+ * - mwei       picoether      lovelace
+ * - gwei       nanoether      shannon      nano
+ * - --         microether     szabo        micro
+ * - --         milliether     finney       milli
+ * - ether      --             --
+ * - kether                    --           grand
+ * - mether
+ * - gether
+ * - tether
  *
  * @method toWei
  * @param {Number|String|BigNumber} number can be a number, number string or a HEX of a decimal
@@ -2368,7 +2373,7 @@ var isFunction = function (object) {
  * @return {Boolean}
  */
 var isObject = function (object) {
-    return object !== null && !(object instanceof Array) && typeof object === 'object';
+    return object !== null && !(Array.isArray(object)) && typeof object === 'object';
 };
 
 /**
@@ -2390,7 +2395,7 @@ var isBoolean = function (object) {
  * @return {Boolean}
  */
 var isArray = function (object) {
-    return object instanceof Array;
+    return Array.isArray(object);
 };
 
 /**
@@ -2475,7 +2480,7 @@ module.exports = {
 
 },{"./sha3.js":19,"bignumber.js":"bignumber.js","utf8":85}],21:[function(require,module,exports){
 module.exports={
-    "version": "0.20.2"
+    "version": "0.20.6"
 }
 
 },{}],22:[function(require,module,exports){
@@ -2686,16 +2691,15 @@ AllSolidityEvents.prototype.encode = function (options) {
 
 AllSolidityEvents.prototype.decode = function (data) {
     data.data = data.data || '';
-    data.topics = data.topics || [];
 
-    var eventTopic = data.topics[0].slice(2);
+
+    var eventTopic = (utils.isArray(data.topics) && utils.isString(data.topics[0])) ? data.topics[0].slice(2) : '';
     var match = this._json.filter(function (j) {
         return eventTopic === sha3(utils.transformToFullName(j));
     })[0];
 
     if (!match) { // cannot find matching event?
-        console.warn('cannot find event for log');
-        return data;
+        return formatters.outputLogFormatter(data);
     }
 
     var event = new SolidityEvent(this._requestManager, match, this._address);
@@ -2911,7 +2915,7 @@ var checkForContractAddress = function(contract, callback){
             } else {
 
                 contract._eth.getTransactionReceipt(contract.transactionHash, function(e, receipt){
-                    if(receipt && !callbackFired) {
+                    if(receipt && receipt.blockHash && !callbackFired) {
 
                         contract._eth.getCode(receipt.contractAddress, function(e, code){
                             /*jshint maxcomplexity: 6 */
@@ -2972,7 +2976,7 @@ var ContractFactory = function (eth, abi) {
      */
     this.new = function () {
         /*jshint maxcomplexity: 7 */
-        
+
         var contract = new Contract(this.eth, this.abi);
 
         // parse arguments
@@ -3004,7 +3008,7 @@ var ContractFactory = function (eth, abi) {
 
         if (callback) {
 
-            // wait for the contract address adn check if the code was deployed
+            // wait for the contract address and check if the code was deployed
             this.eth.sendTransaction(options, function (err, hash) {
                 if (err) {
                     callback(err);
@@ -3292,6 +3296,7 @@ SolidityEvent.prototype.decode = function (data) {
 
     data.data = data.data || '';
     data.topics = data.topics || [];
+
 
     var argTopics = this._anonymous ? data.topics : data.topics.slice(1);
     var indexedData = argTopics.map(function (topics) { return topics.slice(2); }).join("");
@@ -3679,6 +3684,9 @@ module.exports = Filter;
  * @date 2015
  */
 
+'use strict';
+
+
 var utils = require('../utils/utils');
 var config = require('../utils/config');
 var Iban = require('./iban');
@@ -3848,11 +3856,11 @@ var outputBlockFormatter = function(block) {
  * @returns {Object} log
 */
 var outputLogFormatter = function(log) {
-    if(log.blockNumber !== null)
+    if(log.blockNumber)
         log.blockNumber = utils.toDecimal(log.blockNumber);
-    if(log.transactionIndex !== null)
+    if(log.transactionIndex)
         log.transactionIndex = utils.toDecimal(log.transactionIndex);
-    if(log.logIndex !== null)
+    if(log.logIndex)
         log.logIndex = utils.toDecimal(log.logIndex);
 
     return log;
@@ -3931,6 +3939,9 @@ var inputAddressFormatter = function (address) {
 
 
 var outputSyncingFormatter = function(result) {
+    if (!result) {
+        return result;
+    }
 
     result.startingBlock = utils.toDecimal(result.startingBlock);
     result.currentBlock = utils.toDecimal(result.currentBlock);
@@ -4270,17 +4281,16 @@ module.exports = SolidityFunction;
  * @date 2015
  */
 
-
 var errors = require('./errors');
 
 // workaround to use httpprovider in different envs
 
 // browser
 if (typeof window !== 'undefined' && window.XMLHttpRequest) {
-    XMLHttpRequest = window.XMLHttpRequest; // jshint ignore: line
+  XMLHttpRequest = window.XMLHttpRequest; // jshint ignore: line
 // node
 } else {
-    XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest; // jshint ignore: line
+  XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest; // jshint ignore: line
 }
 
 var XHR2 = require('xhr2'); // jshint ignore: line
@@ -4288,9 +4298,12 @@ var XHR2 = require('xhr2'); // jshint ignore: line
 /**
  * HttpProvider should be used to send rpc calls over http
  */
-var HttpProvider = function (host, timeout) {
+var HttpProvider = function (host, timeout, user, password, headers) {
     this.host = host || 'http://localhost:8293';
-    this.timeout = timeout || 0;
+  this.timeout = timeout || 0;
+  this.user = user;
+  this.password = password;
+  this.headers = headers;
 };
 
 /**
@@ -4301,18 +4314,26 @@ var HttpProvider = function (host, timeout) {
  * @return {XMLHttpRequest} object
  */
 HttpProvider.prototype.prepareRequest = function (async) {
-    var request;
+  var request;
 
-    if (async) {
-      request = new XHR2();
-      request.timeout = this.timeout;
-    }else {
-      request = new XMLHttpRequest();
-    }
+  if (async) {
+    request = new XHR2();
+    request.timeout = this.timeout;
+  } else {
+    request = new XMLHttpRequest();
+  }
 
-    request.open('POST', this.host, async);
-    request.setRequestHeader('Content-Type','application/json');
-    return request;
+  request.open('POST', this.host, async);
+  if (this.user && this.password) {
+    var auth = 'Basic ' + new Buffer(this.user + ':' + this.password).toString('base64');
+    request.setRequestHeader('Authorization', auth);
+  } request.setRequestHeader('Content-Type', 'application/json');
+  if(this.headers) {
+      this.headers.forEach(function(header) {
+          request.setRequestHeader(header.name, header.value);
+      });
+  }
+  return request;
 };
 
 /**
@@ -4323,23 +4344,23 @@ HttpProvider.prototype.prepareRequest = function (async) {
  * @return {Object} result
  */
 HttpProvider.prototype.send = function (payload) {
-    var request = this.prepareRequest(false);
+  var request = this.prepareRequest(false);
 
-    try {
-        request.send(JSON.stringify(payload));
-    } catch(error) {
-        throw errors.InvalidConnection(this.host);
-    }
+  try {
+    request.send(JSON.stringify(payload));
+  } catch (error) {
+    throw errors.InvalidConnection(this.host);
+  }
 
-    var result = request.responseText;
+  var result = request.responseText;
 
-    try {
-        result = JSON.parse(result);
-    } catch(e) {
-        throw errors.InvalidResponse(request.responseText);
-    }
+  try {
+    result = JSON.parse(result);
+  } catch (e) {
+    throw errors.InvalidResponse(request.responseText);
+  }
 
-    return result;
+  return result;
 };
 
 /**
@@ -4350,32 +4371,32 @@ HttpProvider.prototype.send = function (payload) {
  * @param {Function} callback triggered on end with (err, result)
  */
 HttpProvider.prototype.sendAsync = function (payload, callback) {
-    var request = this.prepareRequest(true);
+  var request = this.prepareRequest(true);
 
-    request.onreadystatechange = function() {
-        if (request.readyState === 4 && request.timeout !== 1) {
-            var result = request.responseText;
-            var error = null;
+  request.onreadystatechange = function () {
+    if (request.readyState === 4 && request.timeout !== 1) {
+      var result = request.responseText;
+      var error = null;
 
-            try {
-                result = JSON.parse(result);
-            } catch(e) {
-                error = errors.InvalidResponse(request.responseText);
-            }
+      try {
+        result = JSON.parse(result);
+      } catch (e) {
+        error = errors.InvalidResponse(request.responseText);
+      }
 
-            callback(error, result);
-        }
-    };
-
-    request.ontimeout = function() {
-      callback(errors.ConnectionTimeout(this.timeout));
-    };
-
-    try {
-        request.send(JSON.stringify(payload));
-    } catch(error) {
-        callback(errors.InvalidConnection(this.host));
+      callback(error, result);
     }
+  };
+
+  request.ontimeout = function () {
+    callback(errors.ConnectionTimeout(this.timeout));
+  };
+
+  try {
+    request.send(JSON.stringify(payload));
+  } catch (error) {
+    callback(errors.InvalidConnection(this.host));
+  }
 };
 
 /**
@@ -4384,18 +4405,18 @@ HttpProvider.prototype.sendAsync = function (payload, callback) {
  * @method isConnected
  * @return {Boolean} returns true if request haven't failed. Otherwise false
  */
-HttpProvider.prototype.isConnected = function() {
-    try {
-        this.send({
-            id: 9999999999,
-            jsonrpc: '2.0',
-            method: 'net_listening',
-            params: []
-        });
-        return true;
-    } catch(e) {
-        return false;
-    }
+HttpProvider.prototype.isConnected = function () {
+  try {
+    this.send({
+      id: 9999999999,
+      jsonrpc: '2.0',
+      method: 'net_listening',
+      params: []
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
 };
 
 module.exports = HttpProvider;

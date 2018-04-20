@@ -1,7 +1,7 @@
 /* jshint ignore:start */
 Package.describe({
   name: 'nekonium:web3',
-  version: '0.20.2',
+  version: '0.20.6',
   summary: 'Nekonium JavaScript API, middleware to talk to a ethreum node over RPC',
   git: 'https://github.com/nekonium/web3.js',
   // By default, Meteor will default to using README.md for documentation.
