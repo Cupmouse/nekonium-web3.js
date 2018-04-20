@@ -11,11 +11,16 @@ describe('lib/utils/utils', function () {
             assert.equal(utils.fromWei(1000000000000000000, 'gwei'),   '1000000000');
             assert.equal(utils.fromWei(1000000000000000000, 'szabo'),  '1000000');
             assert.equal(utils.fromWei(1000000000000000000, 'finney'), '1000');
+            assert.equal(utils.fromWei(1000000000000000000, 'ether'),  '1');
             assert.equal(utils.fromWei(1000000000000000000, 'nuko'),  '1');
+            assert.equal(utils.fromWei(1000000000000000000, 'kether'), '0.001');
             assert.equal(utils.fromWei(1000000000000000000, 'knuko'), '0.001');
             assert.equal(utils.fromWei(1000000000000000000, 'grand'),  '0.001');
+            assert.equal(utils.fromWei(1000000000000000000, 'mether'), '0.000001');
             assert.equal(utils.fromWei(1000000000000000000, 'mnuko'), '0.000001');
+            assert.equal(utils.fromWei(1000000000000000000, 'gether'), '0.000000001');
             assert.equal(utils.fromWei(1000000000000000000, 'gnuko'), '0.000000001');
+            assert.equal(utils.fromWei(1000000000000000000, 'tether'), '0.000000000001');
             assert.equal(utils.fromWei(1000000000000000000, 'tnuko'), '0.000000000001');
         });
     });
