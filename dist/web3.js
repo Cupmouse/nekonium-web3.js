@@ -1752,26 +1752,43 @@ var ETH_UNITS = [
     'Gwei',
     'szabo',
     'finney',
+    'femtoether',
     'femtonuko',
+    'picoether',
     'piconuko',
+    'nanoether',
     'nanonuko',
+    'microether',
     'micronuko',
+    'milliether',
     'millinuko',
     'nano',
     'micro',
     'milli',
+    'ether',
     'nuko',
     'grand',
+    'Mether',
     'Mnuko',
+    'Gether',
     'Gnuko',
+    'Tether',
     'Tnuko',
+    'Pether',
     'Pnuko',
+    'Eether',
     'Enuko',
+    'Zether',
     'Znuko',
+    'Yether',
     'Ynuko',
+    'Nether',
     'Nnuko',
+    'Dether',
     'Dnuko',
+    'Vether',
     'Vnuko',
+    'Uether',
     'Unuko'
 ];
 
@@ -2153,11 +2170,11 @@ var getValueOfUnit = function (unit) {
  * - gwei       nanonuko      shannon      nano
  * - --         micronuko     szabo        micro
  * - --         millinuko     finney       milli
- * - nuko      --             --
- * - knuko                    --           grand
- * - mnuko
- * - gnuko
- * - tnuko
+ * - ether/nuko      --             --
+ * - kether/knuko    --           grand
+ * - mether/mnuko
+ * - gether/gnuko
+ * - tether/tnuko
  *
  * @method fromWei
  * @param {Number|String} number can be a number, number string or a HEX of a decimal
@@ -2180,11 +2197,11 @@ var fromWei = function(number, unit) {
  * - gwei       nanoether      shannon      nano
  * - --         microether     szabo        micro
  * - --         milliether     finney       milli
- * - ether      --             --
- * - kether                    --           grand
- * - mether
- * - gether
- * - tether
+ * - ether/nuko      --          --
+ * - kether/knuko                --           grand
+ * - mether/mnuko
+ * - gether/gnuko
+ * - tether/tnuko
  *
  * @method toWei
  * @param {Number|String|BigNumber} number can be a number, number string or a HEX of a decimal
@@ -2480,7 +2497,7 @@ module.exports = {
 
 },{"./sha3.js":19,"bignumber.js":"bignumber.js","utf8":84}],21:[function(require,module,exports){
 module.exports={
-    "version": "0.20.6"
+    "version": "0.20.603"
 }
 
 },{}],22:[function(require,module,exports){
@@ -16359,9 +16376,15 @@ module.exports = XMLHttpRequest;
 var Web3 = require('./lib/web3');
 
 // dont override global variable
-if (typeof window !== 'undefined' && typeof window.Web3 === 'undefined') {
-    window.Web3 = Web3;
+if (typeof window !== 'undefined') {
+    if(typeof window.nekonium === 'undefined'){
+        window.nekonium={};
+    }
+    if(typeof window.nekonium.Web3 === 'undefined'){
+        window.nekonium.Web3 = Web3;
+    }
 }
+
 
 module.exports = Web3;
 
