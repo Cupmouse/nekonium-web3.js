@@ -1,3 +1,12 @@
+# Ethereum JavaScript API for Nekonium
+
+This is a web3 library customized for Nekonium.
+
+The differences from Ethereum's Web 3 are as follows.
+
+-Web3 class location is under window/global.nekonium namespace.
+-Additional nuko based currency unit.
+
 # Migration 0.13.0 -> 0.14.0
 
 web3.js version 0.14.0 supports [multiple instances of web3](https://github.com/ethereum/web3.js/issues/297) object.
