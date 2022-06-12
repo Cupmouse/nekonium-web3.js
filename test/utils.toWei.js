@@ -19,16 +19,25 @@ describe('lib/utils/utils', function () {
             assert.equal(utils.toWei(1, 'szabo'),  '1000000000000');
             assert.equal(utils.toWei(1, 'finney'), '1000000000000000');
             assert.equal(utils.toWei(1, 'ether'),  '1000000000000000000');
+            assert.equal(utils.toWei(1, 'nuko'),  '1000000000000000000');
             assert.equal(utils.toWei(1, 'kether'), '1000000000000000000000');
+            assert.equal(utils.toWei(1, 'knuko'), '1000000000000000000000');
             assert.equal(utils.toWei(1, 'grand'),  '1000000000000000000000');
             assert.equal(utils.toWei(1, 'mether'), '1000000000000000000000000');
+            assert.equal(utils.toWei(1, 'mnuko'), '1000000000000000000000000');
             assert.equal(utils.toWei(1, 'gether'), '1000000000000000000000000000');
+            assert.equal(utils.toWei(1, 'gnuko'), '1000000000000000000000000000');
             assert.equal(utils.toWei(1, 'tether'), '1000000000000000000000000000000');
+            assert.equal(utils.toWei(1, 'tnuko'), '1000000000000000000000000000000');
 
             assert.equal(utils.toWei(1, 'kwei'),    utils.toWei(1, 'femtoether'));
+            assert.equal(utils.toWei(1, 'kwei'), utils.toWei(1, 'femtonuko'));
             assert.equal(utils.toWei(1, 'szabo'),   utils.toWei(1, 'microether'));
+            assert.equal(utils.toWei(1, 'szabo'),   utils.toWei(1, 'micronuko'));
             assert.equal(utils.toWei(1, 'finney'),  utils.toWei(1, 'milliether'));
+            assert.equal(utils.toWei(1, 'finney'),  utils.toWei(1, 'millinuko'));
             assert.equal(utils.toWei(1, 'milli'),    utils.toWei(1, 'milliether'));
+            assert.equal(utils.toWei(1, 'milli'),    utils.toWei(1, 'millinuko'));
             assert.equal(utils.toWei(1, 'milli'),    utils.toWei(1000, 'micro'));
 
             assert.throws(function () {utils.toWei(1, 'wei1');}, Error);

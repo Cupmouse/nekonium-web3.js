@@ -11,7 +11,7 @@
     var Web3 = require('web3');
     var web3 = new Web3();
     var BigNumber = require('bignumber.js');
-    web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
+    web3.setProvider(new web3.providers.HttpProvider("http://localhost:8293"));
     var from = web3.eth.coinbase;
     web3.eth.defaultAccount = from;
 

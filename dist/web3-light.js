@@ -1,4 +1,4 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+require=(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 module.exports=[
   {
     "constant": true,
@@ -1769,26 +1769,43 @@ var ETH_UNITS = [
     'szabo',
     'finney',
     'femtoether',
+    'femtonuko',
     'picoether',
+    'piconuko',
     'nanoether',
+    'nanonuko',
     'microether',
+    'micronuko',
     'milliether',
+    'millinuko',
     'nano',
     'micro',
     'milli',
     'ether',
+    'nuko',
     'grand',
     'Mether',
+    'Mnuko',
     'Gether',
+    'Gnuko',
     'Tether',
+    'Tnuko',
     'Pether',
+    'Pnuko',
     'Eether',
+    'Enuko',
     'Zether',
+    'Znuko',
     'Yether',
+    'Ynuko',
     'Nether',
+    'Nnuko',
     'Dether',
+    'Dnuko',
     'Vether',
-    'Uether'
+    'Vnuko',
+    'Uether',
+    'Unuko'
 ];
 
 module.exports = {
@@ -1885,32 +1902,43 @@ var utf8 = require('utf8');
 
 var unitMap = {
     'noether':      '0',
+    'nonuko':       '0',
     'wei':          '1',
     'kwei':         '1000',
     'Kwei':         '1000',
     'babbage':      '1000',
     'femtoether':   '1000',
+    'femtonuko':    '1000',
     'mwei':         '1000000',
     'Mwei':         '1000000',
     'lovelace':     '1000000',
     'picoether':    '1000000',
+    'piconuko':     '1000000',
     'gwei':         '1000000000',
     'Gwei':         '1000000000',
     'shannon':      '1000000000',
     'nanoether':    '1000000000',
+    'nanonuko':     '1000000000',
     'nano':         '1000000000',
     'szabo':        '1000000000000',
     'microether':   '1000000000000',
+    'micronuko':    '1000000000000',
     'micro':        '1000000000000',
     'finney':       '1000000000000000',
-    'milliether':    '1000000000000000',
-    'milli':         '1000000000000000',
+    'milliether':   '1000000000000000',
+    'milli':        '1000000000000000',
+    'millinuko':    '1000000000000000',
     'ether':        '1000000000000000000',
+    'nuko':         '1000000000000000000',
     'kether':       '1000000000000000000000',
+    'knuko':        '1000000000000000000000',
     'grand':        '1000000000000000000000',
     'mether':       '1000000000000000000000000',
+    'mnuko':        '1000000000000000000000000',
     'gether':       '1000000000000000000000000000',
-    'tether':       '1000000000000000000000000000000'
+    'gnuko':        '1000000000000000000000000000',
+    'tether':       '1000000000000000000000000000000',
+    'tnuko':        '1000000000000000000000000000000'
 };
 
 /**
@@ -2129,7 +2157,7 @@ var toHex = function (val) {
  * @throws error if the unit is not correct:w
  */
 var getValueOfUnit = function (unit) {
-    unit = unit ? unit.toLowerCase() : 'ether';
+    unit = unit ? unit.toLowerCase() : 'nuko';
     var unitValue = unitMap[unit];
     if (unitValue === undefined) {
         throw new Error('This unit doesn\'t exists, please use the one of the following units' + JSON.stringify(unitMap, null, 2));
@@ -2531,6 +2559,7 @@ function Web3 (provider) {
     this._requestManager = new RequestManager(provider);
     this.currentProvider = provider;
     this.eth = new Eth(this);
+    this.nekonium = this.eth;
     this.db = new DB(this);
     this.shh = new Shh(this);
     this.net = new Net(this);
@@ -4292,7 +4321,7 @@ var XHR2 = require('xhr2'); // jshint ignore: line
  * HttpProvider should be used to send rpc calls over http
  */
 var HttpProvider = function (host, timeout, user, password) {
-  this.host = host || 'http://localhost:8545';
+  this.host = host || 'http://localhost:8293';
   this.timeout = timeout || 0;
   this.user = user;
   this.password = password;
@@ -13618,8 +13647,16 @@ module.exports = BigNumber; // jshint ignore:line
 var Web3 = require('./lib/web3');
 
 // dont override global variable
-if (typeof window !== 'undefined' && typeof window.Web3 === 'undefined') {
-    window.Web3 = Web3;
+if (typeof window !== 'undefined') {
+    if(typeof window.nekonium === 'undefined'){
+        window.nekonium={};
+    }
+    if(typeof window.nekonium.Web3 === 'undefined'){
+        window.nekonium.Web3 = Web3;
+    }
+    if(typeof window.Web3 === 'undefined') {
+        window.Web3 = Web3;
+    }
 }
 
 module.exports = Web3;
